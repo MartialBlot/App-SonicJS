@@ -1,0 +1,35 @@
+img{
+  background-image: url(../../assets/images/53baa4c68e02ba51277c0bebe2292f48.jpg);
+  background-size: cover;
+  margin-bottom: 6.25%
+
+}
+
+html{
+  background-image: url(../../assets/images/53baa4c68e02ba51277c0bebe2292f48.jpg);
+  background-size: cover;
+}
+
+p{
+  color: gold;
+  font-size: 25px;
+  position: absolute;
+  z-index: 2;
+  margin-left: 43%;
+  margin-top: 55%;
+  font-weight: bold;
+  text-shadow: 0 1px 0 gold;
+  border-radius: 3px;
+  padding: 5px 10px;
+  border: 1px solid gold;
+  box-shadow:0px 0px 50px goldenrod;
+  animation-name: clignote;
+  animation-duration: .5s;
+  animation-iteration-count:infinite;
+}
+
+@keyframes clignote {
+  0%{box-shadow:0px 0px 10px gold;}
+  50%{box-shadow:0px 0px 0px gold;}
+  100%{box-shadow:0px 0px 10px gold;}
+  }
