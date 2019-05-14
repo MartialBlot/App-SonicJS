@@ -1,0 +1,8 @@
+#stage{
+  width: 100%;
+}
+
+#square{
+  position: absolute;
+  z-index: 2;
+}
