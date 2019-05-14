@@ -1,0 +1,46 @@
+.background {
+  background-image: url(../../assets/images/fond.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  height: 100%;
+}
+
+.back{
+  width: 5%;
+  height: 5%;
+  cursor: pointer;
+}
+
+.card{
+  width: 18rem;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 5px 10px;
+  background-color: blue;
+  margin-top: 20px
+}
+
+.btnGo{
+  text-shadow:3px 2px 2px  black;
+}
+
+.btnStart{
+  cursor: pointer;
+  animation-name: clignote;
+  animation-duration: .5s;
+  animation-iteration-count:infinite;
+  text-shadow:3px 2px 2px  black;
+}
+
+@keyframes clignote {
+  0%{font-size: 25.2px;}
+  50%{font-size: 25px;}
+  100%{font-size: 25.2px;}
+  }
+
+.title{
+  color:yellow;
+  text-shadow:3px 2px 2px  black;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
