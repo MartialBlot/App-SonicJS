@@ -9,10 +9,10 @@ It's size for an 13.3" macbook PRO for the moment, please use this resolution : 
 Steps(in terminal, root to project) ==>
 
 --For install--
-. npm install
+- npm install
 
 --For Launch --
-. npm start 
+- npm start 
 
 ## Electron Config
 Can't build an desktop app for the moment.
