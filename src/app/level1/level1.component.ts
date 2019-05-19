@@ -7,179 +7,333 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Level1Component implements OnInit {
 
+
   constructor() { }
 
   ngOnInit() {
-    // this.drawSquare();
-    this.drawStage();
-    this.drawBackground();
   }
 
-  drawBackground() {
-    let canvas = document.getElementById('stage');
+  //Initialisation Canvas
+  ngAfterViewInit(){
+    //Taille du Canvas
+    let canvasWidth = 1200;
+    let canvasHeight = 800;
+
+    //Taille du sprite
+    let spriteWidth = 810;
+    let spriteHeight = 1080;
+
+    //Structure du sprite
+    let rows = 9;
+    let cols = 9;
+
+    //Taille/structure Sprite
+    let width = spriteWidth/cols;
+    let height = spriteHeight/rows;
+
+    //Premiere image
+    let curFrame = 0;
+
+    //Total images
+    let frameCount = 9;
+
+    //Coordonées sprite
+    let x=400;
+    let y=420;
+
+    //x and y coordinates of the canvas to get the single frame
+    let srcX= 0;
+    let srcY= 0;
+
+    //Coordonnées background
+    let bX = 0;
+    let bY = 1080;
+    let tBX = bX;
+    let tBY = bY;
+
+    let canvas : any= document.getElementById('sonic');
+
+    //Propriété du Canvas
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    let background = new Image();
+    background.src = "../../assets/images/maptest.png";
+
     let ctx = canvas.getContext("2d");
 
-  }
+    //Creation de Sonic
+    let sonic = new Image();
+    sonic.src = "../../assets/images/sonic.png";
+    //Sprite Ring
+    let ring = new Image();
+    ring.src = "../../assets/images/ring.png";
 
-  drawStage(){
-    let img1 = new Image();
-    img1.onload = function(){
-      ctx.drawImage(img1, 0, 0, 1200, 800)
+    let ringWidth = 1020;
+    let ringHeight = 65;
+    let ringRows = 1;
+    let ringCols = 16;
+    let rWidth = ringWidth/ringCols;
+    let rHeight = ringHeight/ringRows;
+    let ringCurFrame = 0;
+    let ringFrameCount = 16;
+    let ringX=800;
+    let ringY=420;
+    let ringSrcX= 0;
+    let ringSrcY= 0;
+
+
+    function updateFrame(){
+        //Rafraichissement
+        curFrame = ++curFrame % frameCount;
+        //Calcul coordonnées du sprite
+        srcX = curFrame * width;
+        ctx.clearRect(x,y,width,height);
+
+        ringCurFrame = ++ringCurFrame % ringFrameCount;
+        ringSrcX = ringCurFrame * rWidth;
+        ctx.clearRect(ringX,ringY,rWidth,rHeight);
     }
-    img1.src = '../../assets/images/fond.png';
-    var audio = new Audio('./common/mp3/2006.mp3');
-    let img = new Image();
-    img.src = "../../assets/images/sonic.png";
-    var canvas;
-    canvas = document.getElementById("stage");
-    var x = 0;
-    var y = 0;
-    var xtmp = 0;
-    var ytmp = 0;
-    var ctx = canvas.getContext("2d");
-    img.onload = function() {
-      init();
+
+    //Controls
+    //(delay saut retour position initiale)
+    let posInit = true;
+    function posInitActivate (){
+        posInit = true;
     };
-    var repanim;
-    const scale = .5;
-    const width = 95;
-    const height = 120;
-    const scaledWidth = scale * width;
-    const scaledHeight = scale * height;
 
-    function drawFrame(frameX, frameY, canvasX, canvasY){
-      ctx.drawImage(img, frameX*width - 2, frameY*height, width, height,
-        canvasX, canvasY, scaledWidth, scaledHeight);
-      }
-
-      function init() {
-        repanim = window.requestAnimationFrame(step);
-      }
-
-      const cycleLoop = [1, 2, 3, 4];
-      let currentLoopIndex = 0;
-      let frameCount = 0;
-
-      function step() {
-        frameCount++;
-        if (frameCount < 10) {
-          repanim = window.requestAnimationFrame(step);
-          return;
+    let keyState = {};
+    document.addEventListener('keydown',function(e){
+        keyState[e.keyCode || e.which] = true;
+    },true);
+    document.addEventListener('keyup',function(e){
+        keyState[e.keyCode || e.which] = false;
+        if(posInit){
+        initDroit()
         }
-        frameCount = 0;
-        ctx.clearRect(x, y, scaledWidth, scaledHeight);
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawFrame(cycleLoop[currentLoopIndex], 0, x, y);
-        currentLoopIndex++;
-        if (currentLoopIndex >= cycleLoop.length) {
-          currentLoopIndex = 0;
+    },true);
+
+    function gameLoop() {
+        //Control droit
+        if (keyState[39] || keyState[68]){
+            bX += 2;
+            ringX -=2;
+            droite();
         }
-        repanim = window.requestAnimationFrame(step);
-      }
-
-      // document.addEventListener("keyup", controls);
-      // document.addEventListener("keydown", controls);
-      document.addEventListener("keypress", controls);
-
-      function controls(event) {
-        if (event.key == 'a') {
-          deplgauche(); }
-          else if (event.key == 'w') {
-            deplhaut(); }
-            else if (event.key == 'd') {
-              depldroite(); }
-              else if (event.key == 's') {
-                deplbas(); }
-              }
-
-              function depldroite() {
-                if (x <= 280)
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x += 10;
-                  y += 0;
-                  display();
+        if (keyState[39]&& keyState[16] || keyState[68] && keyState[16]){
+            bX += 3;
+            ringX -=3;
+            courirDroit();
+        }
+        //Control gauche
+        if (keyState[37] || keyState[65]){
+            bX -= 2;
+            ringX +=2;
+            gauche();
+        }
+        if (keyState[37]&& keyState[16] || keyState[65] && keyState[16]){
+            bX -= 3;
+            ringX +=3;
+            courirGauche();
+        }
+        //Control Boule
+        if (keyState[83] || keyState[40]){
+            boule();
+            if (keyState[39]&& keyState[16] || keyState[68] && keyState[16]){
+                bX += 3;
+                ringX -=3;
+                bouleRapideDroit();
                 }
-                else
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x = -30;
-                  y += 0;
-                  display();
+            if (keyState[37]&& keyState[16] || keyState[65] && keyState[16]){
+                bX -= 3;
+                ringX +=3;
+                bouleRapideGauche();
                 }
-              }
+        }
+        //Control Saut
+        if (keyState[32]){
+            sautDroit()
+            animSaut();
+        }
 
-              function deplgauche() {
-                if (x > -30)
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x -= 10;
-                  y += 0;
-                  display();
-                }
-                else
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x = 290;
-                  y += 0;
-                  display();
-                }
-              }
+        if (keyState[32] && keyState[68] || keyState[32] && keyState[39]){
+            sautDroit();
+            animSaut();
+        }
 
-              function deplhaut() {
-                if (y > 0)
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x += 0;
-                  y -= 10;
-                  display();
-                }
-              }
+        if (keyState[32] && keyState[65] || keyState[32] && keyState[37]){
+            sautGauche()
+            animSaut();
+        }
 
-              function deplbas() {
-                if (y <= 80)
-                {
-                  xtmp = x;
-                  ytmp = y;
-                  clear();
-                  x += 0;
-                  y += 10;
-                  display();
-                }
-              }
+        setTimeout(gameLoop, 10);
+    }
+    gameLoop();
 
-              function display() {
-                repanim = window.requestAnimationFrame(step);
-                audio.play();
-                ctx.beginPath();
-                ctx.arc(240, 100, 20, 0, Math.PI*2, false);
-                ctx.fillStyle = "green";
-                ctx.fill();
-                ctx.closePath();
-              }
+    function draw(){
+        //Rafraichissement
+        updateFrame();
+        ctx.drawImage(background,bX,0,1400,bY,0,-100,1200,900);
+        ctx.drawImage(ring,ringSrcX, ringSrcY,rWidth,rHeight,ringX,ringY,rWidth,rHeight);
+        ctx.drawImage(sonic,srcX,srcY,width,height,x,y,width,height);
+    }
 
-              function clear() {
-                cancelAnimationFrame(repanim);
-                ctx.clearRect(xtmp, ytmp, scaledWidth, scaledHeight);
+    function initDroit(){
+        posInitActivate();
+        rows = 9;
+        cols = 9;
+        y=420;
+        spriteWidth = 810;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 9;
+        srcX= 0;
+        srcY= 0;
+    }
 
-                // ctx.clearRect(x, y, 93, 120);
-              }
-            }
-          }
+    function initGauche(){
+        rows = 9;
+        cols = 6;
+        y=420;
+        spriteWidth = 540;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 6;
+        srcX= 0;
+        srcY= 715;
+    }
 
-          // drawSquare(){
-          //   let canvas = document.getElementById('square');
-          //   let ctx = canvas.getContext("2d");
-          //   ctx.fillStyle = "#D74022";
-          //   ctx.fillRect(75, 75, 30, 10);
-          // }
+    function droite(){
+        rows = 9;
+        cols = 3;
+        y=420;
+        spriteWidth = 288;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 3;
+        srcX= 0;
+        srcY= 130;
+    }
+
+    function gauche(){
+        rows = 9;
+        cols = 3;
+        y=420;
+        spriteWidth = 285;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 3;
+        srcX= 0;
+        srcY= 590;
+    }
+
+    function boule(){
+        rows = 9;
+        cols = 4;
+        y=480;
+        spriteWidth = 289;
+        spriteHeight = 600;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 4;
+        srcX= 0;
+        srcY= 380;
+    }
+
+    function bouleRapideDroit(){
+        rows = 9;
+        cols = 3;
+        y=469;
+        spriteWidth = 330;
+        spriteHeight = 630;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 3;
+        srcX= 0;
+        srcY= 980;
+    }
+
+    function bouleRapideGauche(){
+        rows = 9;
+        cols = 3;
+        y=469;
+        spriteWidth = 330;
+        spriteHeight = 630;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 3;
+        srcX= 0;
+        srcY= 1065;
+    }
+
+    function courirDroit(){
+        rows = 9;
+        cols = 4;
+        y=420;
+        spriteWidth = 400;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 4;
+        srcX= 0;
+        srcY= 258;
+    }
+
+    function courirGauche(){
+        rows = 9;
+        cols = 4;
+        y=420;
+        spriteWidth = 440;
+        spriteHeight = 1080;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 4;
+        srcX= 0;
+        srcY= 850;
+    }
+
+    function sautDroit(){
+        posInit = false
+        rows = 9;
+        cols = 5;
+        y=420;
+        spriteWidth = 450;
+        spriteHeight = 1100;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 4;
+        srcX= 0;
+        srcY= 456;
+        setTimeout(initDroit,500)
+    }
+
+    function sautGauche(){
+        posInit = false
+        rows = 9;
+        cols = 5;
+        y=420;
+        spriteWidth = 450;
+        spriteHeight = 1070;
+        width = spriteWidth/cols;
+        height = spriteHeight/rows;
+        frameCount = 4;
+        srcX= 0;
+        srcY= 1157;
+        setTimeout(initDroit,500)
+    }
+
+    function animSaut(){
+        setTimeout(function(){bY+=10; ringY-=10},100)
+        setTimeout(function(){bY+=10; ringY-=10},200)
+        setTimeout(function(){bY+=5; ringY-=5},100)
+        setTimeout(function(){bY-=15; ringY+=15},100)
+        setTimeout(function(){bY-=10; ringY+=10},100)
+    }
+
+    setInterval(draw,80);
+
+  }
+}
